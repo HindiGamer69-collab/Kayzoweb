@@ -1,0 +1,828 @@
+/* ============================================================
+   KAYZO — MINIMALIST AESTHETIC BIOLINK PORTFOLIO
+   With Interactive Aesthetic Lamp Switch & Full Video Background
+   ============================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+  background-color: #000000;
+  font-family: 'Poppins', sans-serif;
+  color: #ffffff;
+  user-select: none;
+}
+
+body.locked-scroll {
+  overflow: hidden !important;
+  height: 100vh;
+}
+
+/* ============================================================
+   1. FULLSCREEN VIDEO BACKGROUND
+   ============================================================ */
+.video-background-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -2;
+  pointer-events: none;
+}
+
+.background-video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  filter: contrast(1.05) brightness(0.95);
+}
+
+.video-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+
+/* ============================================================
+   2. AESTHETIC LAMP CLICK-TO-ENTER OVERLAY
+   ============================================================ */
+.lamp-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #090a0f;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s ease;
+}
+
+.lamp-overlay.turned-on {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.lamp-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 40px;
+}
+
+/* The Lamp Structure */
+.aesthetic-lamp {
+  position: relative;
+  width: 160px;
+  height: 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.25s ease;
+}
+
+.aesthetic-lamp:hover {
+  transform: scale(1.04);
+}
+
+/* Glowing Aura behind lamp when active */
+.lamp-glow-halo {
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 230, 140, 0.85) 0%, rgba(255, 195, 60, 0.4) 45%, transparent 75%);
+  opacity: 0;
+  pointer-events: none;
+  filter: blur(25px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.lamp-stage.lamp-on .lamp-glow-halo {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.15);
+}
+
+/* Finial Top Knob */
+.lamp-finial {
+  width: 8px;
+  height: 10px;
+  background: #a37c44;
+  border-radius: 4px 4px 0 0;
+  margin-bottom: -1px;
+  z-index: 4;
+}
+
+/* Lamp Shade */
+.lamp-shade {
+  width: 130px;
+  height: 90px;
+  background: #1c1e26;
+  clip-path: polygon(18% 0%, 82% 0%, 100% 100%, 0% 100%);
+  position: relative;
+  z-index: 3;
+  box-shadow: inset 0 -8px 12px rgba(0, 0, 0, 0.7);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  transition: background 0.35s ease, box-shadow 0.35s ease, filter 0.35s ease;
+}
+
+/* When Lamp is ON */
+.lamp-stage.lamp-on .lamp-shade {
+  background: radial-gradient(circle at 50% 70%, #ffffff 0%, #fff0b8 40%, #ffc038 90%);
+  box-shadow: 
+    0 0 35px rgba(255, 220, 90, 0.95),
+    0 0 70px rgba(255, 185, 45, 0.7),
+    0 0 120px rgba(255, 150, 20, 0.4);
+  filter: drop-shadow(0 0 20px rgba(255, 215, 80, 0.9));
+}
+
+.shade-inner-light {
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  filter: blur(4px);
+  transition: background 0.3s ease;
+}
+
+.lamp-stage.lamp-on .shade-inner-light {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 1);
+}
+
+/* Pull Cord with Bead */
+.lamp-pull-cord {
+  position: absolute;
+  top: 98px;
+  right: 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 4;
+  cursor: pointer;
+  transform-origin: top center;
+  animation: cordSway 4s ease-in-out infinite alternate;
+  transition: transform 0.15s ease-out;
+}
+
+@keyframes cordSway {
+  0% { transform: rotate(-2deg); }
+  100% { transform: rotate(2deg); }
+}
+
+.cord-line {
+  width: 2px;
+  height: 38px;
+  background: #baa270;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
+}
+
+.cord-bead {
+  width: 7px;
+  height: 9px;
+  background: #d4b574;
+  border-radius: 3px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+}
+
+/* Pulled state */
+.lamp-pull-cord.pulled {
+  transform: translateY(12px) !important;
+}
+
+/* Stem */
+.lamp-stem {
+  width: 6px;
+  height: 80px;
+  background: linear-gradient(90deg, #6b5028 0%, #d4b067 50%, #6b5028 100%);
+  margin-top: -4px;
+  z-index: 2;
+  box-shadow: 0 0 6px rgba(0, 0, 0, 0.7);
+}
+
+/* Base */
+.lamp-base {
+  width: 72px;
+  height: 12px;
+  background: linear-gradient(180deg, #d4b067 0%, #85612c 100%);
+  border-radius: 6px 6px 2px 2px;
+  z-index: 2;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+}
+
+.lamp-shadow {
+  width: 90px;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 50%;
+  margin-top: 4px;
+  filter: blur(4px);
+}
+
+/* Hint Text */
+.lamp-hint {
+  margin-top: 32px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.88rem;
+  color: #cccccc;
+  letter-spacing: 1.5px;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  transition: opacity 0.3s;
+}
+
+.hint-text {
+  animation: hintBlink 2.2s infinite ease-in-out;
+}
+
+@keyframes hintBlink {
+  0% { opacity: 0.4; }
+  50% { opacity: 1; }
+  100% { opacity: 0.4; }
+}
+
+/* ============================================================
+   3. TOP-LEFT CONTROLS (AUDIO TOGGLE 🔊)
+   ============================================================ */
+.top-bar-controls {
+  position: fixed;
+  top: 24px;
+  left: 24px;
+  z-index: 30;
+}
+
+.audio-btn {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  cursor: pointer;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.9));
+}
+
+.audio-btn:hover {
+  opacity: 1;
+  transform: scale(1.12);
+}
+
+.audio-icon {
+  stroke: #ffffff;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ============================================================
+   4. SCROLLABLE WRAPPER & HERO SCREEN
+   ============================================================ */
+.scroll-wrapper {
+  width: 100%;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+}
+
+.scroll-wrapper.revealed {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* Hero Screen (Screen 1) */
+.hero-screen {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+}
+
+/* Profile Avatar */
+.avatar-wrapper {
+  margin-bottom: 16px;
+  position: relative;
+}
+
+.profile-avatar {
+  width: 108px;
+  height: 108px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 255, 255, 0.2);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 255, 255, 0.35);
+}
+
+/* Glowing Username with Sparkles */
+.username-wrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 8px;
+}
+
+.username-text {
+  font-size: clamp(2.4rem, 5.2vw, 3.2rem);
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  position: relative;
+  z-index: 2;
+  text-shadow:
+    0 0 8px rgba(255, 255, 255, 0.95),
+    0 0 18px rgba(255, 255, 255, 0.75),
+    0 0 30px rgba(255, 255, 255, 0.5),
+    0 0 48px rgba(255, 255, 255, 0.35);
+  animation: glowPulse 3s ease-in-out infinite alternate;
+}
+
+@keyframes glowPulse {
+  0% {
+    text-shadow:
+      0 0 8px rgba(255, 255, 255, 0.95),
+      0 0 18px rgba(255, 255, 255, 0.75),
+      0 0 30px rgba(255, 255, 255, 0.5),
+      0 0 48px rgba(255, 255, 255, 0.35);
+  }
+  100% {
+    text-shadow:
+      0 0 12px rgba(255, 255, 255, 1),
+      0 0 24px rgba(255, 255, 255, 0.85),
+      0 0 38px rgba(255, 255, 255, 0.65),
+      0 0 58px rgba(255, 255, 255, 0.45);
+  }
+}
+
+/* Sparkles Canvas overlaying the username */
+.sparkles-canvas {
+  position: absolute;
+  top: -25px;
+  left: -40px;
+  width: calc(100% + 80px);
+  height: calc(100% + 50px);
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* ============================================================
+   AESTHETIC BADGES ROW (SWORD + MINECRAFT LOGO)
+   ============================================================ */
+.profile-badges-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 4px 0 10px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.badge-item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4), 0 0 10px rgba(129, 140, 248, 0.18);
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+  outline: none;
+}
+
+.badge-item:hover, .badge-item:focus-visible {
+  transform: translateY(-2px) scale(1.12);
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.4);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(129, 140, 248, 0.4);
+}
+
+.badge-item#swordBadge:hover {
+  transform: translateY(-2px) scale(1.12) rotate(-6deg);
+}
+
+.mc-badge-item:hover {
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6), 0 0 20px rgba(74, 222, 128, 0.45);
+}
+
+.aesthetic-sword-svg {
+  width: 26px;
+  height: 26px;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 0 4px rgba(129, 140, 248, 0.6));
+}
+
+.badge-item:hover .aesthetic-sword-svg {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 12px rgba(129, 140, 248, 0.8));
+}
+
+.minecraft-logo-svg {
+  width: 26px;
+  height: 26px;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 0 4px rgba(74, 222, 128, 0.5));
+}
+
+.mc-badge-item:hover .minecraft-logo-svg {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.9)) drop-shadow(0 0 12px rgba(74, 222, 128, 0.8));
+  transform: rotate(4deg);
+}
+
+/* Tooltip */
+.badge-custom-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(6px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: rgba(14, 16, 26, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 5px 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.7), 0 0 15px rgba(255, 255, 255, 0.2);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s ease;
+  white-space: nowrap;
+  z-index: 20;
+}
+
+.badge-item:hover .badge-custom-tooltip,
+.badge-item:focus-visible .badge-custom-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+}
+
+.tooltip-text {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #ffffff;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+}
+
+.tooltip-arrow {
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%) rotate(45deg);
+  width: 8px;
+  height: 8px;
+  background: rgba(14, 16, 26, 0.94);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+  background: rgba(14, 16, 26, 0.92);
+  border-right: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Bio Text */
+.bio-wrapper {
+  text-align: center;
+  margin-top: 6px;
+}
+
+.bio-text {
+  font-size: 1.05rem;
+  font-weight: 500;
+  color: #ffffff;
+  letter-spacing: 0.01em;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9), 0 0 12px rgba(255, 255, 255, 0.35);
+  white-space: pre;
+}
+
+/* Animated Scroll Down Cue */
+.scroll-cue {
+  position: absolute;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  color: rgba(255, 255, 255, 0.75);
+  transition: color 0.2s ease, transform 0.2s ease;
+  animation: scrollFloat 2.2s infinite ease-in-out;
+}
+
+.scroll-cue:hover {
+  color: #ffffff;
+}
+
+.scroll-cue-text {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.scroll-cue-arrow {
+  stroke: currentColor;
+}
+
+@keyframes scrollFloat {
+  0% { transform: translate(-50%, 0); }
+  50% { transform: translate(-50%, 8px); }
+  100% { transform: translate(-50%, 0); }
+}
+
+/* ============================================================
+   5. DETAILS SECTION (SERVERS & SOCIALS - SCREEN 2)
+   ============================================================ */
+.details-section {
+  width: 100%;
+  max-width: 580px;
+  margin: 0 auto;
+  padding: 20px 20px 80px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.section-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section-title-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+
+.section-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: #a5b4fc;
+  background: rgba(165, 180, 252, 0.1);
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(165, 180, 252, 0.2);
+}
+
+.section-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0 14px rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================================
+   SERVERS GRID & CARDS
+   ============================================================ */
+.servers-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.server-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: rgba(16, 18, 28, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.server-card:hover {
+  transform: translateY(-3px);
+  background: rgba(24, 27, 40, 0.82);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.12);
+}
+
+/* Server Badge Icons */
+.server-icon-frame {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+.zeqa-badge {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(185, 28, 28, 0.3) 100%);
+  color: #f87171;
+}
+
+.smp-badge {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.2) 0%, rgba(29, 78, 216, 0.3) 100%);
+  color: #60a5fa;
+}
+
+.mc-badge {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(4, 120, 87, 0.3) 100%);
+  color: #34d399;
+}
+
+.server-info {
+  flex: 1;
+}
+
+.server-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 2px;
+  letter-spacing: -0.01em;
+}
+
+.server-role {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+/* Join Button Pill */
+.server-join-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.server-card:hover .server-join-btn {
+  background: #ffffff;
+  color: #000000;
+  border-color: #ffffff;
+}
+
+/* ============================================================
+   SOCIAL BUTTONS
+   ============================================================ */
+.socials-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.social-button {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 14px 20px;
+  background: rgba(16, 18, 28, 0.68);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  text-decoration: none;
+  color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.social-button:hover {
+  transform: translateY(-3px);
+  background: rgba(24, 27, 40, 0.82);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.7), 0 0 20px rgba(255, 255, 255, 0.12);
+}
+
+.social-icon-wrapper {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ig-icon {
+  background: linear-gradient(45deg, rgba(240, 148, 51, 0.2), rgba(230, 104, 60, 0.2), rgba(220, 39, 67, 0.2), rgba(204, 35, 102, 0.2), rgba(188, 24, 136, 0.2));
+  color: #f43f5e;
+}
+
+.dc-icon {
+  background: rgba(88, 101, 242, 0.2);
+  color: #818cf8;
+}
+
+.gmail-icon {
+  background: rgba(234, 67, 53, 0.2);
+  color: #f87171;
+}
+
+.social-meta {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.social-platform {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.social-handle {
+  font-size: 0.82rem;
+  color: #94a3b8;
+}
+
+.social-action-arrow {
+  color: #94a3b8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.social-button:hover .social-action-arrow {
+  transform: translate(2px, -2px);
+  color: #ffffff;
+}
+
+/* Biolink Footer */
+.biolink-footer {
+  text-align: center;
+  padding-top: 10px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.45);
+}
